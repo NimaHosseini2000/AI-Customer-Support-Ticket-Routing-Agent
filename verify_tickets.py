@@ -204,7 +204,7 @@ def run() -> bool:
             print(f'  Message: "{preview}..."')
 
             with patch("app.routes.tickets.analyze_ticket", return_value=scenario["ai_response"]):
-                resp = client.post("/tickets", json=scenario["input"])
+                resp = client.post("/api/v1/tickets", json=scenario["input"])
 
             ok = check("POST /tickets returns 200", resp.status_code == 200)
             data = resp.json()
@@ -238,7 +238,7 @@ def run() -> bool:
         for ticket_id, scenario in zip(created_ids, TICKETS):
             name = scenario["input"]["customer_name"]
             print(f"GET /tickets/{ticket_id}  ({name})")
-            resp = client.get(f"/tickets/{ticket_id}")
+            resp = client.get(f"/api/v1/tickets/{ticket_id}")
 
             check("returns 200", resp.status_code == 200)
             data = resp.json()
@@ -268,7 +268,7 @@ def run() -> bool:
         # ------------------------------------------------------------------ #
         section("PHASE 3 -- List Endpoint (GET /tickets)")
 
-        resp = client.get("/tickets")
+        resp = client.get("/api/v1/tickets")
         check("returns 200", resp.status_code == 200)
         data = resp.json()
         check(f"returns exactly {len(TICKETS)} tickets", len(data) == len(TICKETS))
@@ -290,17 +290,17 @@ def run() -> bool:
         section("PHASE 4 -- Error Handling")
 
         print("404 for non-existent ticket")
-        check("GET /tickets/9999 returns 404", client.get("/tickets/9999").status_code == 404)
+        check("GET /tickets/9999 returns 404", client.get("/api/v1/tickets/9999").status_code == 404)
         print()
 
         print("422 for missing required fields")
         check("POST with only customer_name returns 422",
-              client.post("/tickets", json={"customer_name": "Ghost"}).status_code == 422)
+              client.post("/api/v1/tickets", json={"customer_name": "Ghost"}).status_code == 422)
         print()
 
         print("422 for invalid email format")
         check("POST with malformed email returns 422",
-              client.post("/tickets", json={
+              client.post("/api/v1/tickets", json={
                   "customer_name": "Bad",
                   "email": "not-an-email",
                   "message": "Test",
@@ -309,7 +309,7 @@ def run() -> bool:
 
         print("422 for empty message body")
         check("POST with empty message string returns 422",
-              client.post("/tickets", json={
+              client.post("/api/v1/tickets", json={
                   "customer_name": "Empty",
                   "email": "e@example.com",
                   "message": "",

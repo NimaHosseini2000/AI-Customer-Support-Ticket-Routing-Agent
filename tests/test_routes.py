@@ -9,7 +9,7 @@ _MOCK_ANALYSIS = {
 
 
 def test_health_check(client):
-    response = client.get("/health")
+    response = client.get("/api/v1/health")
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
 
@@ -17,7 +17,7 @@ def test_health_check(client):
 def test_create_ticket_valid(client):
     with patch("app.routes.tickets.analyze_ticket", return_value=_MOCK_ANALYSIS):
         response = client.post(
-            "/tickets",
+            "/api/v1/tickets",
             json={
                 "customer_name": "John Smith",
                 "email": "john@example.com",
@@ -37,27 +37,27 @@ def test_create_ticket_valid(client):
 
 def test_create_ticket_invalid_payload(client):
     response = client.post(
-        "/tickets",
+        "/api/v1/tickets",
         json={"customer_name": "John Smith"},
     )
     assert response.status_code == 422
 
 
 def test_get_all_tickets_empty(client):
-    response = client.get("/tickets")
+    response = client.get("/api/v1/tickets")
     assert response.status_code == 200
     assert response.json() == []
 
 
 def test_get_ticket_not_found(client):
-    response = client.get("/tickets/999")
+    response = client.get("/api/v1/tickets/999")
     assert response.status_code == 404
 
 
 def test_get_ticket_by_id(client):
     with patch("app.routes.tickets.analyze_ticket", return_value=_MOCK_ANALYSIS):
         client.post(
-            "/tickets",
+            "/api/v1/tickets",
             json={
                 "customer_name": "Jane Doe",
                 "email": "jane@example.com",
@@ -65,7 +65,7 @@ def test_get_ticket_by_id(client):
             },
         )
 
-    response = client.get("/tickets/1")
+    response = client.get("/api/v1/tickets/1")
     assert response.status_code == 200
     data = response.json()
     assert data["id"] == 1
