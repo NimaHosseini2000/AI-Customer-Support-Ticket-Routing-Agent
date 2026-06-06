@@ -1,8 +1,12 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 def send_notification(category: str, priority: str, assigned_team: str) -> None:
-    print("\n===================================")
-    print("NEW SUPPORT TICKET")
-    print("===================================\n")
-    print(f"Category:      {category}")
-    print(f"Priority:      {priority}")
-    print(f"Assigned Team: {assigned_team}")
-    print("\n===================================\n")
+    logger.info(
+        "NEW TICKET | Category: %-18s | Priority: %-8s | Team: %s",
+        category,
+        priority,
+        assigned_team,
+    )

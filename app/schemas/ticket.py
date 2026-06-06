@@ -26,6 +26,7 @@ class TicketDetail(BaseModel):
     customer_name: str
     email: str
     message: str
+    status: str
     created_at: datetime
     analysis: Optional[AnalysisResponse] = None
 
