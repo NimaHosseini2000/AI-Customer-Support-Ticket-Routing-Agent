@@ -1,6 +1,14 @@
+import logging
+
 from dotenv import load_dotenv
 
 load_dotenv()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s  %(levelname)-8s  %(name)s  %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
 from fastapi import FastAPI  # noqa: E402
 
@@ -16,4 +24,4 @@ app = FastAPI(
     version="1.0.0",
 )
 
-app.include_router(tickets.router)
+app.include_router(tickets.router, prefix="/api/v1")
