@@ -28,11 +28,17 @@ Return ONLY valid JSON in this exact format:
 }"""
 
 
+_openai_client: OpenAI | None = None
+
+
 def _get_client() -> OpenAI:
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise EnvironmentError("OPENAI_API_KEY environment variable is not set")
-    return OpenAI(api_key=api_key)
+    global _openai_client
+    if _openai_client is None:
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise EnvironmentError("OPENAI_API_KEY environment variable is not set")
+        _openai_client = OpenAI(api_key=api_key)
+    return _openai_client
 
 
 _REQUIRED_KEYS = {"category", "priority", "summary", "suggested_response"}
