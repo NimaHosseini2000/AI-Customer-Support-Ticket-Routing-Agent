@@ -35,24 +35,37 @@ def _get_client() -> OpenAI:
     return OpenAI(api_key=api_key)
 
 
+_REQUIRED_KEYS = {"category", "priority", "summary", "suggested_response"}
+
+
+def _validate(parsed: dict) -> dict:
+    missing = _REQUIRED_KEYS - parsed.keys()
+    if missing:
+        raise ValueError(
+            f"AI response missing required fields: {sorted(missing)}. "
+            f"Keys received: {sorted(parsed.keys())}"
+        )
+    return parsed
+
+
 def parse_ai_response(text: str) -> dict:
-    """Extract and parse JSON from the AI response text."""
+    """Extract, parse, and validate JSON from the AI response text."""
     try:
-        return json.loads(text)
+        return _validate(json.loads(text))
     except json.JSONDecodeError:
         pass
 
     code_block = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", text)
     if code_block:
         try:
-            return json.loads(code_block.group(1))
+            return _validate(json.loads(code_block.group(1)))
         except json.JSONDecodeError:
             pass
 
     json_object = re.search(r"\{[\s\S]*\}", text)
     if json_object:
         try:
-            return json.loads(json_object.group(0))
+            return _validate(json.loads(json_object.group(0)))
         except json.JSONDecodeError:
             pass
 

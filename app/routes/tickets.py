@@ -28,8 +28,7 @@ def create_ticket(payload: TicketCreate, db: Session = Depends(get_db)):
         message=payload.message,
     )
     db.add(ticket)
-    db.commit()
-    db.refresh(ticket)
+    db.flush()  # populates ticket.id within the open transaction; nothing committed yet
 
     customer_info = lookup_customer(payload.email)
 
@@ -40,8 +39,10 @@ def create_ticket(payload: TicketCreate, db: Session = Depends(get_db)):
             customer_status=customer_info["status"],
         )
     except ValueError as exc:
+        db.rollback()
         raise HTTPException(status_code=422, detail=str(exc))
     except (RuntimeError, EnvironmentError) as exc:
+        db.rollback()
         raise HTTPException(status_code=502, detail=str(exc))
 
     assigned_team = route_ticket(analysis_data["category"])
@@ -55,7 +56,7 @@ def create_ticket(payload: TicketCreate, db: Session = Depends(get_db)):
         assigned_team=assigned_team,
     )
     db.add(analysis)
-    db.commit()
+    db.commit()  # single commit: ticket + analysis land together or not at all
 
     send_notification(
         category=analysis_data["category"],
