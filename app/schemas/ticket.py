@@ -1,15 +1,15 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 from app.schemas.analysis import AnalysisResponse
 
 
 class TicketCreate(BaseModel):
-    customer_name: str
+    customer_name: str = Field(min_length=1)
     email: EmailStr
-    message: str
+    message: str = Field(min_length=1)
 
 
 class TicketResponse(BaseModel):
