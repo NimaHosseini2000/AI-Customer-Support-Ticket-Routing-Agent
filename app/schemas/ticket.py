@@ -7,9 +7,9 @@ from app.schemas.analysis import AnalysisResponse
 
 
 class TicketCreate(BaseModel):
-    customer_name: str = Field(min_length=1)
+    customer_name: str = Field(min_length=1, max_length=200)
     email: EmailStr
-    message: str = Field(min_length=1)
+    message: str = Field(min_length=1, max_length=5000)
 
 
 class TicketResponse(BaseModel):

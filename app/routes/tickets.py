@@ -17,7 +17,11 @@ router = APIRouter()
 
 
 @router.get("/health")
-def health_check():
+def health_check(db: Session = Depends(get_db)):
+    try:
+        db.execute(text("SELECT 1"))
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"Database unavailable: {exc}")
     return {"status": "ok"}
 
 
