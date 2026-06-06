@@ -13,6 +13,7 @@ class Ticket(Base):
     customer_name = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False, index=True)
     message = Column(Text, nullable=False)
+    status = Column(String(50), nullable=False, default="open")
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     analysis = relationship("TicketAnalysis", back_populates="ticket", uselist=False)
